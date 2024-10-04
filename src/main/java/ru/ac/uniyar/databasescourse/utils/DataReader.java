@@ -46,7 +46,6 @@ public class DataReader {
 
             students.add(new Student(studentID, studentName, studentSurname));
             solutions.add(new Solution(solutionID, hasPassed, score, studentID, reviewerID));
-            reviewers.add(new Reviewer(reviewerID, reviewerSurname));
         }
     }
 }
