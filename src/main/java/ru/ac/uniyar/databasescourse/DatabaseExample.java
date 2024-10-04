@@ -1,16 +1,24 @@
 package ru.ac.uniyar.databasescourse;
 
+import java.io.IOException;
 import java.sql.*;
+import java.nio.file.Path;
+
+import static ru.ac.uniyar.databasescourse.utils.DataReader.csvRead;
 
 public class DatabaseExample {
     private static final String URL = String.format("jdbc:mariadb://%s", System.getenv("MARIADB_HOST"));
     private static final String user = System.getenv("MARIADB_USER");
     private static final String password = System.getenv("MARIADB_PASSWORD");
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         System.out.println("The work has started");
-        System.out.println(System.getenv("MARIADB_HOST"));
-        String query = "SELECT card, name, surname FROM students";
+        try{
+            csvRead(Path.of("data.csv"));
+        }
+        catch(IOException ex){
+            System.out.printf("Error: %s\n", ex);
+        }
         try (Connection conn = createConnection()) {
             try (Statement smt = conn.createStatement()) {
                 TaskClass.createTable(smt);
