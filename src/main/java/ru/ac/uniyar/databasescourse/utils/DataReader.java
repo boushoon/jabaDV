@@ -1,9 +1,7 @@
 package ru.ac.uniyar.databasescourse.utils;
 
 import de.siegmar.fastcsv.reader.CsvRow;
-import ru.ac.uniyar.databasescourse.objects.Reviewer;
-import ru.ac.uniyar.databasescourse.objects.Solution;
-import ru.ac.uniyar.databasescourse.objects.Student;
+import ru.ac.uniyar.databasescourse.objects.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,11 +12,20 @@ import java.util.Objects;
 import static ru.ac.uniyar.databasescourse.utils.SomeCsvDataLoader.load;
 
 public class DataReader {
-    public static void csvRead(Path path) throws IOException {
+    private static Department findDepartment(ArrayList<Department> departments, String name){
+        for(Department department: departments){
+            if (department.getName().equals(name))
+                return department;
+        }
+        return null;
+    }
+
+    public static DataResult csvRead(Path path) throws IOException {
         ArrayList<CsvRow> arrayOfRow = load(path);
         ArrayList<Student> students = new ArrayList<>();
         ArrayList<Solution> solutions = new ArrayList<>();
         ArrayList<Reviewer> reviewers = new ArrayList<>();
+        ArrayList<Department> departments = new ArrayList<>();
 
         for(CsvRow row: arrayOfRow){
             List<String> fields = row.getFields();
@@ -43,9 +50,17 @@ public class DataReader {
             catch (NumberFormatException ex){
                 System.out.printf("Can`t read data in csv: %s\n", ex);
             }
+            Department dpt = findDepartment(departments, reviewerDepartment);
+            if (dpt == null) {
+                dpt = new Department(reviewerDepartment);
+                departments.add(dpt);
+            }
 
             students.add(new Student(studentID, studentName, studentSurname));
             solutions.add(new Solution(solutionID, hasPassed, score, studentID, reviewerID));
+            reviewers.add(new Reviewer(reviewerID, reviewerSurname, dpt.getId()));
         }
+
+        return new DataResult(students, solutions, reviewers, departments);
     }
 }
