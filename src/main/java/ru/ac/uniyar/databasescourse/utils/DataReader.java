@@ -20,6 +20,22 @@ public class DataReader {
         return null;
     }
 
+    private static Student findStudent(ArrayList<Student> students, int id){
+        for(Student student: students){
+            if (student.getId() == id)
+                return student;
+        }
+        return null;
+    }
+
+    private static Reviewer findReviewer(ArrayList<Reviewer> reviewers, int id){
+        for(Reviewer reviewer: reviewers){
+            if (reviewer.getId() == id)
+                return reviewer;
+        }
+        return null;
+    }
+
     public static DataResult csvRead(Path path) throws IOException {
         ArrayList<CsvRow> arrayOfRow = load(path);
         ArrayList<Student> students = new ArrayList<>();
@@ -56,9 +72,19 @@ public class DataReader {
                 departments.add(dpt);
             }
 
-            students.add(new Student(studentID, studentName, studentSurname));
-            solutions.add(new Solution(solutionID, hasPassed, score, studentID, reviewerID));
-            reviewers.add(new Reviewer(reviewerID, reviewerSurname, dpt.getId()));
+            Student student = findStudent(students, studentID);
+            if (student == null){
+                student = new Student(studentID, studentName, studentSurname);
+                students.add(student);
+            }
+
+            Reviewer reviewer = findReviewer(reviewers, reviewerID);
+            if (reviewer == null){
+                reviewer = new Reviewer(reviewerID, reviewerSurname, dpt.getId());
+                reviewers.add(reviewer);
+            }
+
+            solutions.add(new Solution(solutionID, hasPassed, score, reviewer.getId(), student.getId()));
         }
 
         return new DataResult(students, solutions, reviewers, departments);

@@ -7,7 +7,7 @@ public class Department {
 
     public Department(String name) {
         this.name = name;
-        id = count++;
+        id = ++count;
     }
 
     public String getName() {
