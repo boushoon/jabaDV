@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Task {
-    public static void createTables(Statement smt){
+    public static void createTables(Connection conn){
         String query =
                 "CREATE TABLE IF NOT EXISTS students(" +
                 "id INT PRIMARY KEY NOT NULL," +
@@ -34,7 +34,8 @@ public class Task {
                 "reviewerID INT," +
                 "FOREIGN KEY(studentID) REFERENCES students(id)," +
                 "FOREIGN KEY(reviewerID) REFERENCES reviewers(id));";
-        try (ResultSet rs = smt.executeQuery(query)) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.executeQuery();
             System.out.println("все хорошо!!!!11");
         }
         catch (SQLException ex) {
@@ -108,50 +109,54 @@ public class Task {
         }
     }
 
-    public static void dropStudentsTable(Statement smt) {
+    public static void dropStudentsTable(Connection conn) {
         String query = "DROP TABLE IF EXISTS students";
 
-        try (ResultSet rs = smt.executeQuery(query)) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.executeQuery();
             System.out.println("Table 'students' dropped successfully!");
         } catch (SQLException ex) {
             System.out.printf("Error: %s\n", ex);
         }
     }
 
-    public static void dropDepartmentTable(Statement smt) {
+    public static void dropDepartmentTable(Connection conn) {
         String query = "DROP TABLE IF EXISTS departments";
 
-        try (ResultSet rs = smt.executeQuery(query)) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.executeQuery();
             System.out.println("Table 'department' dropped successfully!");
         } catch (SQLException ex) {
             System.out.printf("Error: %s\n", ex);
         }
     }
 
-    public static void dropReviewersTable(Statement smt) {
+    public static void dropReviewersTable(Connection conn) {
         String query = "DROP TABLE IF EXISTS reviewers";
 
-        try (ResultSet rs = smt.executeQuery(query)) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.executeQuery();
             System.out.println("Table 'reviewers' dropped successfully!");
         } catch (SQLException ex) {
             System.out.printf("Error: %s\n", ex);
         }
     }
 
-    public static void dropSolutionsTable(Statement smt) {
+    public static void dropSolutionsTable(Connection conn) {
         String query = "DROP TABLE IF EXISTS solutions";
 
-        try (ResultSet rs = smt.executeQuery(query)) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            statement.executeQuery();
             System.out.println("Table 'solutions' dropped successfully!");
         } catch (SQLException ex) {
             System.out.printf("Error: %s\n", ex);
         }
     }
 
-    public static void dropAllTables(Statement smt) {
-        dropSolutionsTable(smt);
-        dropReviewersTable(smt);
-        dropStudentsTable(smt);
-        dropDepartmentTable(smt);
+    public static void dropAllTables(Connection conn) {
+        dropSolutionsTable(conn);
+        dropReviewersTable(conn);
+        dropStudentsTable(conn);
+        dropDepartmentTable(conn);
     }
 }

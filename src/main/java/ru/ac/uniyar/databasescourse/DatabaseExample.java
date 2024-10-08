@@ -31,12 +31,14 @@ public class DatabaseExample {
 
         try (Connection conn = createConnection()) {
             try (Statement smt = conn.createStatement()) {
-                Task.dropAllTables(smt);
-                Task.createTables(smt);
+                /*Practice 2
+                Task.dropAllTables(conn);
+                Task.createTables(conn);
                 Task.insertStudents(conn, students);
                 Task.insertDepartments(conn, departments);
                 Task.insertReviewers(conn, reviewers);
                 Task.insertSolutions(conn, solutions);
+                 */
             }
             catch (SQLException ex) {
                 System.out.printf("Can't create statement: %s\n", ex);
