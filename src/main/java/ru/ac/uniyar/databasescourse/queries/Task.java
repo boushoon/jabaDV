@@ -109,6 +109,100 @@ public class Task {
         }
     }
 
+    public static void selectMaxScoreStudents(Connection conn){
+        String query =
+                "SELECT students.id, students.name, students.surname, solutions.score\n" +
+                "FROM students\n" +
+                "JOIN solutions ON students.id = solutions.studentID\n" +
+                "WHERE score = (SELECT MAX(score) from solutions);";
+
+        try(PreparedStatement statement = conn.prepareStatement(query)){
+            ResultSet rs = statement.executeQuery();
+            System.out.println("Students with the highest score:");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String surname = rs.getString("surname");
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tName: %s %s\n\tScore: %.2f\n\n", id, name, surname, score);
+            }
+        } catch (SQLException ex){
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
+    public static void selectMinScoreStudents(Connection conn) {
+        String query =
+                "SELECT students.id, students.name, students.surname, solutions.score\n" +
+                "FROM students\n" +
+                "JOIN solutions ON students.id = solutions.studentID\n" +
+                "WHERE score = (SELECT MIN(score) FROM solutions);";
+
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            ResultSet rs = statement.executeQuery();
+            System.out.println("Students with the lowest score:");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String surname = rs.getString("surname");
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tName: %s %s\n\tScore: %.2f\n\n", id, name, surname, score);
+            }
+        } catch (SQLException ex) {
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
+    public static void selectMaxScoreReviewers(Connection conn) {
+        String query =
+                "SELECT reviewers.id, reviewers.surname, departments.name as department, solutions.score\n" +
+                "FROM reviewers\n" +
+                "JOIN solutions ON reviewers.id = solutions.reviewerID\n" +
+                "JOIN departments ON reviewers.departmentID = departments.id\n" +
+                "WHERE score = (SELECT MAX(score) FROM solutions);";
+
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            ResultSet rs = statement.executeQuery();
+            System.out.println("Reviewer with the highest score:");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String surname = rs.getString("surname");
+                String department = rs.getString("department");
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tSurname: %s\n\tDepartment: %s\n\tScore: %.2f\n\n", id, surname, department, score);
+            }
+        } catch (SQLException ex) {
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
+    public static void selectMinScoreReviewers(Connection conn) {
+        String query =
+                "SELECT reviewers.id, reviewers.surname, departments.name as department, solutions.score\n" +
+                "FROM reviewers\n" +
+                "JOIN solutions ON reviewers.id = solutions.reviewerID\n" +
+                "JOIN departments ON reviewers.departmentID = departments.id\n" +
+                "WHERE score = (SELECT MIN(score) FROM solutions);";
+
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            ResultSet rs = statement.executeQuery();
+            System.out.println("Reviewer with the lowest score:");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String surname = rs.getString("surname");
+                String department = rs.getString("department");
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tSurname: %s\n\tDepartment: %s\n\tScore: %.2f\n\n", id, surname, department, score);
+            }
+        } catch (SQLException ex) {
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
     public static void dropStudentsTable(Connection conn) {
         String query = "DROP TABLE IF EXISTS students";
 

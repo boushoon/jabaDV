@@ -39,6 +39,12 @@ public class DatabaseExample {
                 Task.insertReviewers(conn, reviewers);
                 Task.insertSolutions(conn, solutions);
                  */
+
+                //Practice 3
+                Task.selectMaxScoreStudents(conn);
+                Task.selectMinScoreStudents(conn);
+                Task.selectMaxScoreReviewers(conn);
+                Task.selectMinScoreReviewers(conn);
             }
             catch (SQLException ex) {
                 System.out.printf("Can't create statement: %s\n", ex);
