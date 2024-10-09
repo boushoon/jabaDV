@@ -118,7 +118,7 @@ public class Task {
                 "SELECT students.id, students.name, students.surname, AVG(solutions.score) AS avg\n" +
                         "FROM solutions\n" +
                         "JOIN students ON solutions.studentID = students.id\n" +
-                        "GROUP BY students.id, students.name, students.surname\n" +
+                        "GROUP BY students.id\n" +
                         "HAVING AVG(solutions.score) = (\n" +
                         "   SELECT " + function + "(avg)\n" +
                         "   FROM (\n" +
@@ -148,50 +148,40 @@ public class Task {
         }
     }
 
-    public static void selectMaxScoreReviewers(Connection conn) {
-        String query =
-                "SELECT reviewers.id, reviewers.surname, departments.name as department, solutions.score\n" +
-                "FROM reviewers\n" +
-                "JOIN solutions ON reviewers.id = solutions.reviewerID\n" +
-                "JOIN departments ON reviewers.departmentID = departments.id\n" +
-                "WHERE score = (SELECT MAX(score) FROM solutions);";
+    public static void selectMaxOrMinScoreReviewers(Connection conn, boolean minOrMax){
+        // minOrMax = 1 -> Max
+        // minOrMax = 0 -> Min
+        String function = minOrMax ? "MAX" : "MIN";
 
-        try (PreparedStatement statement = conn.prepareStatement(query)) {
+        String query =
+                "SELECT reviewers.id, reviewers.surname, AVG(solutions.score) AS avg\n" +
+                        "FROM solutions\n" +
+                        "JOIN reviewers ON solutions.reviewerID = reviewers.id\n" +
+                        "GROUP BY reviewers.id\n" +
+                        "HAVING AVG(solutions.score) = (\n" +
+                        "   SELECT " + function + "(avg)\n" +
+                        "   FROM (\n" +
+                        "       SELECT AVG(solutions.score) AS avg\n" +
+                        "       FROM solutions\n" +
+                        "       GROUP BY solutions.reviewerID\n" +
+                        "   ) AS subquery\n" +
+                        ");";
+
+        try(PreparedStatement statement = conn.prepareStatement(query)){
             ResultSet rs = statement.executeQuery();
-            System.out.println("Reviewer with the highest score:");
+
+            if (minOrMax)
+                System.out.println("Reviewers with the highest average score:");
+            else
+                System.out.println("Reviewers with the lowest average score:");
 
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String surname = rs.getString("surname");
-                String department = rs.getString("department");
-                double score = rs.getDouble("score");
-                System.out.printf("\tID: %d\n\tSurname: %s\n\tDepartment: %s\n\tScore: %.2f\n\n", id, surname, department, score);
+                double score = rs.getDouble("avg");
+                System.out.printf("\tID: %d\n\tSurname: %s\n\tAverage score: %.2f\n\n", id, surname, score);
             }
-        } catch (SQLException ex) {
-            System.out.printf("Error: %s\n", ex);
-        }
-    }
-
-    public static void selectMinScoreReviewers(Connection conn) {
-        String query =
-                "SELECT reviewers.id, reviewers.surname, departments.name as department, solutions.score\n" +
-                "FROM reviewers\n" +
-                "JOIN solutions ON reviewers.id = solutions.reviewerID\n" +
-                "JOIN departments ON reviewers.departmentID = departments.id\n" +
-                "WHERE score = (SELECT MIN(score) FROM solutions);";
-
-        try (PreparedStatement statement = conn.prepareStatement(query)) {
-            ResultSet rs = statement.executeQuery();
-            System.out.println("Reviewer with the lowest score:");
-
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String surname = rs.getString("surname");
-                String department = rs.getString("department");
-                double score = rs.getDouble("score");
-                System.out.printf("\tID: %d\n\tSurname: %s\n\tDepartment: %s\n\tScore: %.2f\n\n", id, surname, department, score);
-            }
-        } catch (SQLException ex) {
+        } catch (SQLException ex){
             System.out.printf("Error: %s\n", ex);
         }
     }
