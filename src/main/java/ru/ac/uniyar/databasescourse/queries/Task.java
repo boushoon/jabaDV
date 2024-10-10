@@ -149,8 +149,10 @@ public class Task {
     }
 
     public static void selectMaxOrMinScoreReviewers(Connection conn, boolean minOrMax){
-        // minOrMax = 1 -> Max
-        // minOrMax = 0 -> Min
+        /*
+        minOrMax = 1 -> Max
+        minOrMax = 0 -> Min
+         */
         String function = minOrMax ? "MAX" : "MIN";
 
         String query =
@@ -180,6 +182,37 @@ public class Task {
                 String surname = rs.getString("surname");
                 double score = rs.getDouble("avg");
                 System.out.printf("\tID: %d\n\tSurname: %s\n\tAverage score: %.2f\n\n", id, surname, score);
+            }
+        } catch (SQLException ex){
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
+    public static void distributionOfScore(Connection conn){
+        String query =
+                "SELECT reviewers.id as rev_id, reviewers.surname as rev_surname, " +
+                        "students.id as stud_id, students.name as stud_name, " +
+                        "students.surname as stud_surname, AVG(solutions.score) as avg\n" +
+                "FROM solutions \n" +
+                "JOIN students ON solutions.studentID = students.id \n" +
+                "JOIN reviewers ON solutions.reviewerID = reviewers.id\n" +
+                "GROUP BY reviewers.id, students.id;";
+
+        System.out.println("Distribution of score among students:");
+
+        try(PreparedStatement statement = conn.prepareStatement(query)){
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                int rev_id = rs.getInt("rev_id");
+                int stud_id = rs.getInt("stud_id");
+
+                String rev_surname = rs.getString("rev_surname");
+                String stud_surname = rs.getString("stud_surname");
+                String stud_name = rs.getString("stud_name");
+                double score = rs.getDouble("avg");
+                System.out.printf("\tREV_ID: %d\n\tSurname: %s" +
+                        "\n\t\tSTUD_ID: %d\n\t\tName: %s %s\n\t\tAverage score: %.2f\n\n", rev_id, rev_surname, stud_id,
+                        stud_name, stud_surname, score);
             }
         } catch (SQLException ex){
             System.out.printf("Error: %s\n", ex);

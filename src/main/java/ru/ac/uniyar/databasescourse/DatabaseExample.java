@@ -41,11 +41,13 @@ public class DatabaseExample {
                  */
 
                 //Practice 3
-                Task.selectMaxOrMinScoreStudents(conn, true); // Максимум
-                Task.selectMaxOrMinScoreStudents(conn, false); // Минимум
+                //Task.selectMaxOrMinScoreStudents(conn, true); // Максимум
+                //Task.selectMaxOrMinScoreStudents(conn, false); // Минимум
 
-                Task.selectMaxOrMinScoreReviewers(conn, true);
-                Task.selectMaxOrMinScoreReviewers(conn, false);
+                //Task.selectMaxOrMinScoreReviewers(conn, true);
+                //Task.selectMaxOrMinScoreReviewers(conn, false);
+
+                //Task.distributionOfScore(conn);
             }
             catch (SQLException ex) {
                 System.out.printf("Can't create statement: %s\n", ex);
