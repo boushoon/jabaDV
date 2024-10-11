@@ -115,18 +115,13 @@ public class Task {
         String function = minOrMax ? "MAX" : "MIN";
 
         String query =
-                "SELECT students.id, students.name, students.surname, AVG(solutions.score) AS avg\n" +
-                        "FROM solutions\n" +
-                        "JOIN students ON solutions.studentID = students.id\n" +
-                        "GROUP BY students.id\n" +
-                        "HAVING AVG(solutions.score) = (\n" +
-                        "   SELECT " + function + "(avg)\n" +
-                        "   FROM (\n" +
-                        "       SELECT AVG(solutions.score) AS avg\n" +
-                        "       FROM solutions\n" +
-                        "       GROUP BY solutions.studentID\n" +
-                        "   ) AS subquery\n" +
-                        ");";
+                "WITH query AS (\n" +
+                        "\tSELECT s.id, s.name, s.surname, sol.score\n" +
+                        " \tFROM solutions sol\n" +
+                        " \tJOIN students s ON sol.studentID = s.id\n" +
+                        ")\n" +
+                        "SELECT id, name, surname, score from query\n" +
+                        "WHERE score = (SELECT" + function + "(score) FROM query);";
 
         try(PreparedStatement statement = conn.prepareStatement(query)){
             ResultSet rs = statement.executeQuery();
@@ -156,18 +151,13 @@ public class Task {
         String function = minOrMax ? "MAX" : "MIN";
 
         String query =
-                "SELECT reviewers.id, reviewers.surname, AVG(solutions.score) AS avg\n" +
-                        "FROM solutions\n" +
-                        "JOIN reviewers ON solutions.reviewerID = reviewers.id\n" +
-                        "GROUP BY reviewers.id\n" +
-                        "HAVING AVG(solutions.score) = (\n" +
-                        "   SELECT " + function + "(avg)\n" +
-                        "   FROM (\n" +
-                        "       SELECT AVG(solutions.score) AS avg\n" +
-                        "       FROM solutions\n" +
-                        "       GROUP BY solutions.reviewerID\n" +
-                        "   ) AS subquery\n" +
-                        ");";
+                "WITH query AS (\n" +
+                "\tSELECT r.id, r.surname, sol.score\n" +
+                " \tFROM solutions sol\n" +
+                " \tJOIN reviewers r ON sol.reviewerID = r.id\n" +
+                ")\n" +
+                "SELECT id, surname, score from query\n" +
+                "WHERE score = (SELECT" + function + "(score) FROM query);";
 
         try(PreparedStatement statement = conn.prepareStatement(query)){
             ResultSet rs = statement.executeQuery();
@@ -212,6 +202,36 @@ public class Task {
                 double score = rs.getDouble("avg");
                 System.out.printf("\tREV_ID: %d\n\tSurname: %s" +
                         "\n\t\tSTUD_ID: %d\n\t\tName: %s %s\n\t\tAverage score: %.2f\n\n", rev_id, rev_surname, stud_id,
+                        stud_name, stud_surname, score);
+            }
+        } catch (SQLException ex){
+            System.out.printf("Error: %s\n", ex);
+        }
+    }
+
+    public static void countScore(Connection conn){
+        String query =
+                "SELECT s.id as stud_id, s.name as stud_name, s.surname as stud_surname,\n" +
+                "r.id as rev_id, r.surname as rev_surname, COUNT(sol.id) as rev_count from solutions sol\n" +
+                "JOIN students s ON sol.studentID = s.id\n" +
+                "JOIN reviewers r ON sol.reviewerID = r.id\n" +
+                "GROUP BY s.id, r.id\n" +
+                "ORDER BY COUNT(sol.id) DESC;";
+
+        System.out.println("Count score among reviewers:");
+
+        try(PreparedStatement statement = conn.prepareStatement(query)){
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                int rev_id = rs.getInt("rev_id");
+                int stud_id = rs.getInt("stud_id");
+
+                String rev_surname = rs.getString("rev_surname");
+                String stud_surname = rs.getString("stud_surname");
+                String stud_name = rs.getString("stud_name");
+                int score = rs.getInt("rev_count");
+                System.out.printf("\tREV_ID: %d\n\tSurname: %s" +
+                                "\n\t\tSTUD_ID: %d\n\t\tName: %s %s\n\t\tCount score: %d\n\n", rev_id, rev_surname, stud_id,
                         stud_name, stud_surname, score);
             }
         } catch (SQLException ex){

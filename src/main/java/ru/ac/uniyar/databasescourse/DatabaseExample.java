@@ -48,6 +48,7 @@ public class DatabaseExample {
                 //Task.selectMaxOrMinScoreReviewers(conn, false);
 
                 //Task.distributionOfScore(conn);
+                Task.countScore(conn);
             }
             catch (SQLException ex) {
                 System.out.printf("Can't create statement: %s\n", ex);
