@@ -116,12 +116,12 @@ public class Task {
 
         String query =
                 "WITH query AS (\n" +
-                        "\tSELECT s.id, s.name, s.surname, sol.score\n" +
-                        " \tFROM solutions sol\n" +
-                        " \tJOIN students s ON sol.studentID = s.id\n" +
-                        ")\n" +
-                        "SELECT id, name, surname, score from query\n" +
-                        "WHERE score = (SELECT" + function + "(score) FROM query);";
+                "\tSELECT s.id, s.name, s.surname, sol.score\n" +
+                " \tFROM solutions sol\n" +
+                " \tJOIN students s ON sol.studentID = s.id\n" +
+                ")\n" +
+                "SELECT id, name, surname, score from query\n" +
+                "WHERE score = (SELECT " + function + "(score) FROM query);";
 
         try(PreparedStatement statement = conn.prepareStatement(query)){
             ResultSet rs = statement.executeQuery();
@@ -135,8 +135,8 @@ public class Task {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String surname = rs.getString("surname");
-                double score = rs.getDouble("avg");
-                System.out.printf("\tID: %d\n\tName: %s %s\n\tAverage score: %.2f\n\n", id, name, surname, score);
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tName: %s %s\n\tScore: %.2f\n\n", id, name, surname, score);
             }
         } catch (SQLException ex){
             System.out.printf("Error: %s\n", ex);
@@ -157,7 +157,7 @@ public class Task {
                 " \tJOIN reviewers r ON sol.reviewerID = r.id\n" +
                 ")\n" +
                 "SELECT id, surname, score from query\n" +
-                "WHERE score = (SELECT" + function + "(score) FROM query);";
+                "WHERE score = (SELECT " + function + "(score) FROM query);";
 
         try(PreparedStatement statement = conn.prepareStatement(query)){
             ResultSet rs = statement.executeQuery();
@@ -170,8 +170,8 @@ public class Task {
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String surname = rs.getString("surname");
-                double score = rs.getDouble("avg");
-                System.out.printf("\tID: %d\n\tSurname: %s\n\tAverage score: %.2f\n\n", id, surname, score);
+                double score = rs.getDouble("score");
+                System.out.printf("\tID: %d\n\tSurname: %s\n\tScore: %.2f\n\n", id, surname, score);
             }
         } catch (SQLException ex){
             System.out.printf("Error: %s\n", ex);
